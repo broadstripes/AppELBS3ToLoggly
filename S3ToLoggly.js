@@ -2,6 +2,7 @@
 
 var aws = require('aws-sdk')
 var s3 = new aws.S3({apiVersion: '2006-03-01'})
+var zlib = require('zlib')
 
 var _ = require('lodash')
 , async = require('async')
@@ -96,7 +97,7 @@ exports.handler = function(event, context) {
                 bufferStream.end()
                 console.log( 'Using Loggly endpoint: ' + LOGGLY_URL )
 
-                bufferStream.pipe(request.post(LOGGLY_URL)).on('error', function(err) {next(err)}).on('end', function() {next()})
+                bufferStream.pipe(zlib.createGunzip()).pipe(request.post(LOGGLY_URL)).on('error', function(err) {next(err)}).on('end', function() {next()})
             }
         ], 
         function (err) {
